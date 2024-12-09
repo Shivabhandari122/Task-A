@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Scrolling Cards</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f59d66, #9b5de5);
+            overflow: hidden;
+        }
+
+        .card-container {
+            position: relative;
+            width: 350px;
+            height: 500px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            height: 160px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            backdrop-filter: blur(10px);
+            cursor: move;
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+        }
+
+        .circle {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .line {
+            width: 80%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="cards">
+            <div class="card">
+                <div class="circle"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <div class="card">
+                <div class="circle"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <div class="card">
+                <div class="circle"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cardsContainer = document.querySelector('.cards');
+        const cardContainer = document.querySelector('.card-container');
+        const cards = document.querySelectorAll('.card');
+
+        let isDragging = false;
+        let startY;
+        let initialTop;
+
+        // Handle mouse down
+        cardContainer.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.card')) {
+                isDragging = true;
+                startY = e.pageY - cardContainer.offsetTop;
+                initialTop = cardsContainer.offsetTop;
+                cards.forEach(card => card.classList.add('dragging'));
+            }
+        });
+
+        // Handle mouse move
+        cardContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const y = e.pageY - cardContainer.offsetTop;
+            const scroll = y - startY;
+            const newTop = initialTop + scroll;
+            cardsContainer.style.top = `${newTop}px`;
+
+            // Looping effect
+            if (newTop > cardContainer.clientHeight) {
+                cardsContainer.style.top = `-${cardsContainer.scrollHeight - cardContainer.clientHeight}px`;
+            } else if (newTop < -cardsContainer.scrollHeight) {
+                cardsContainer.style.top = `${cardContainer.clientHeight}px`;
+            }
+        });
+
+        // Stop dragging
+        cardContainer.addEventListener('mouseup', () => {
+            if (isDragging) {
+                cards.forEach(card => card.classList.remove('dragging'));
+                isDragging = false;
+            }
+        });
+
+        cardContainer.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                cards.forEach(card => card.classList.remove('dragging'));
+                isDragging = false;
+            }
+        });
+    </script>
+</body>
+</html>
